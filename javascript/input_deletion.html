@@ -1,0 +1,133 @@
+<script>
+      
+    /** 
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     * ~~~~~~~~~~ MULTILINE EDIT ~~~~~~~~~~~~~~~
+     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     */
+    
+    /**
+     * Check whether the provided edit location is 'start' or 'end'.
+     */
+    function isValidEditLocation(location) {
+  
+        if (!location) {
+          alert("Please select an edit location.");
+          return false;
+        }
+        else if (!["start", "end"].includes(location)) {
+          alert("Invalid edit location.");
+          return false;
+        }
+        else {
+          return true;
+        }
+  
+    }
+  
+  
+    /**
+     * Hide one element and show another.
+     * For showing the next screen after a button click.
+     */
+    function hideAndShowElements(hideElement, showElement) {
+      document.querySelector(hideElement).style.display = "none";
+      document.querySelector(showElement).style.display = "block";
+    }
+  
+  
+    /**
+     * Call the corresponding .gs script to: 
+     *  Edit a multiline selection of text.
+     *    Edit options: INSERT, DELETE
+     *    Edit locations: START, END of line
+     */
+    function runMultilineEdit(action) {
+  
+      // Validate input
+      if (!["insert", "delete"].includes(action)) {
+        alert("Invalid action. Please specify 'insert' or 'delete'.");
+        return;
+      }
+  
+      const actionToVarName = {
+        insert: "insertion",
+        delete: "deletion"
+      };
+  
+      // Wait for <action>LocationButton click
+      let location = '';
+      document.querySelector(`#${actionToVarName[action]}LocationButton`).addEventListener('click', () => {
+  
+        // Capture location
+        location = document.querySelector(`input[name="${actionToVarName[action]}Location"]:checked`).value;     
+        if (!isValidEditLocation(location)) return;
+  
+        // Hide <action>LocationForm + show <action>ValueForm
+        hideAndShowElements(`#${actionToVarName[action]}LocationForm`, `#${actionToVarName[action]}ValueForm`);
+  
+      });
+  
+      // Wait for <action>ValueBackButton click
+      document.querySelector(`#${actionToVarName[action]}ValueBackButton`).addEventListener('click', () => {
+        // Hide <action>ValueForm + show <action>LocationForm
+        hideAndShowElements(`#${actionToVarName[action]}ValueForm`, `#${actionToVarName[action]}LocationForm`);
+      });
+  
+      // Wait for <action>Value click
+      let actionValue = '';
+      document.querySelector(`#${actionToVarName[action]}ValueButton`).addEventListener('click', () => {
+  
+        // Capture <action>Value
+        actionValue = document.querySelector(`#${actionToVarName[action]}Value`).value;
+        if (!actionValue) {
+          if (action === "insert") alert("Please enter text to insert.");
+          else if (action === "delete") alert("Please enter # of characters to delete.");
+          return;
+        }
+        if (action === "delete") {
+          try {
+            actionValue = Number(actionValue);
+          }
+          catch (error) {
+            alert("Invalid # of characters to delete. Please specify a positive integer.");
+            return;
+          }
+        }
+        if (!isValidEditLocation(location)) return;
+      
+        // Organize inputs for editMultilineText()
+        let insertionValue, numCharactersDelete;
+        if (action === "insert") {
+          insertionValue = actionValue;
+          numCharactersDelete = 0;
+        }
+        else if (action === "delete") {
+          insertionValue = "";
+          numCharactersDelete = actionValue;
+        }
+  
+        // Pass value back to .gs script for insertion / deletion
+        google.script.run
+          .withSuccessHandler(() => { // Success handler required to prevent closing of host before edit finishes
+            if (action === "insert") console.log("Text inserted successfully.");
+            else if (action === "delete") console.log("Characters deleted successfully.");
+            hideAndShowElements(`#${actionToVarName[action]}ValueForm`, `#${actionToVarName[action]}LocationForm`);
+          })
+          .withFailureHandler((error) => {
+            console.error("Error editing text:", error);
+          })          
+          .editMultilineText(action, location, inputText = insertionValue, numCharactersDelete = numCharactersDelete); // JavaScript doesn't support named parameters
+  
+      });
+  
+    }
+  
+  
+    // Create dependency between keyboard listeners and the DOM loading.
+    document.addEventListener('DOMContentLoaded', () => {
+      runMultilineEdit("insert");
+      runMultilineEdit("delete");
+    });
+  
+  </script>
