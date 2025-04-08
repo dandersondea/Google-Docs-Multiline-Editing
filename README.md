@@ -1,13 +1,12 @@
 # Google Docs Multiline Editing
 
 TODO:
- 
+
  1. Create README.md
- 2. Implement HELP MODAL using README.md (https://www.alexwforsythe.com/code-blocks/)
+ 2. Make sure GitHub's README.md is public
  3. Submit as an ADD-ON > Enable > Chrome Extensions SHORTCUTS (chrome://extensions/shortcuts)
  4. Record video (<3 min) > YouTube
  5. SUBMIT!
- 
 
 ## Introduction
 
@@ -97,6 +96,9 @@ JavaScript code wrapped in HTML files to be loaded by `sidebar.html` (Google App
 
 < TODO >
 
+##### `help_modal.html`
+
+Modal that links to this `README.md` on GitHub to provide users with more information.
 
 ### Limitations
 
@@ -108,19 +110,19 @@ JavaScript code wrapped in HTML files to be loaded by `sidebar.html` (Google App
 - The script.run funciton is slow
 - Google Docs doesn't support multiple cursors
 
-### Possible next steps
+## Possible next steps
 
-*All features:*
+### All features
 
 1. Explore ways to reduce mouse usage by establishing keyboard shortcuts for:
     1. Opening the multiline editing sidebar
     2. Changing the browser's focus from the document to the sidebar and back (for moving lines)
 
-*Multiline insert:*
+### Multiline insert
 
 1. Add an option for parsing escape characters (which are currently interpreted as literal text).
 
-*Move line:*
+### Move line(s)
 
 1. If lag can be reduced, use intervals to allow continuously moving line(s) via holding down the relevant keys (rather than just repeatedly pressing them).
 2. Enable moving noncontiguous selections by reworking how `anchorSwapIndex` is defined in `line_switching.gs`.
