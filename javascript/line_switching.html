@@ -1,68 +1,68 @@
 <script>
 
-    /** 
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     * ~~~~~~~~~~ LINE SHIFTING ~~~~~~~~~~~
-     * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-     */
+  /** 
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   * ~~~~~~~~~~ LINE SHIFTING ~~~~~~~~~~~
+   * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+   */
 
-    let isMoveLineScriptRunning = false; // Debounce
-    let moveLineDebounceQueue = 0;
+  let isMoveLineScriptRunning = false; // Debounce
+  let moveLineDebounceQueue = 0;
 
-    /**
-     * Call the corresponding .gs script to:
-     *  Move a selection (with fallback to a cursor's line) a # of elements up/down in the document body based on direction.
-     *    1) 'direction' > 0 moves the line DOWN; < 0 " " UP.
-     *    2) abs(direction) determines the # of lines to move in the specified direction.
-     */
-    function runMoveLineScript(direction) {
+  /**
+   * Call the corresponding .gs script to:
+   *  Move a selection (with fallback to a cursor's line) a # of elements up/down in the document body based on direction.
+   *    1) 'direction' > 0 moves the line DOWN; < 0 " " UP.
+   *    2) abs(direction) determines the # of lines to move in the specified direction.
+   */
+  function runMoveLineScript(direction) {
 
-        if (isMoveLineScriptRunning) {
-        moveLineDebounceQueue = moveLineDebounceQueue + direction;
-        return;
-        }
+    if (isMoveLineScriptRunning) {
+      moveLineDebounceQueue = moveLineDebounceQueue + direction;
+      return;
+    }
 
-        isMoveLineScriptRunning = true;
-        google.script.run
-        .withSuccessHandler(() => {
-                console.log(`Line shifted successfully '${direction}'.`);
-                isMoveLineScriptRunning = false;
-                if (moveLineDebounceQueue != 0) {
-                const nextDirection = moveLineDebounceQueue;
-                moveLineDebounceQueue = 0;
-                runMoveLineScript(nextDirection);
-                }
-            })
-        .withFailureHandler((error) => {
-            console.error(`Error shifting line '${direction}':`, error);
+    isMoveLineScriptRunning = true;
+    google.script.run
+      .withSuccessHandler(() => {
+            console.log(`Line shifted successfully '${direction}'.`);
             isMoveLineScriptRunning = false;
-            moveLineDebounceQueue = 0;
-        })
-        .moveLine(direction);
+            if (moveLineDebounceQueue != 0) {
+              const nextDirection = moveLineDebounceQueue;
+              moveLineDebounceQueue = 0;
+              runMoveLineScript(nextDirection);
+            }
+          })
+      .withFailureHandler((error) => {
+        console.error(`Error shifting line '${direction}':`, error);
+        isMoveLineScriptRunning = false;
+        moveLineDebounceQueue = 0;
+      })
+      .moveLine(direction);
 
-    }
-
-
-    /**
-     * Trigger runMoveLineScript() when a user presses CMD + CTRL + Up/Down
-     */
-    function addLineShiftingKeyboardListener() {
-
-        document.addEventListener('keydown', (event) => {
-        if (event.altKey) { 
-
-            if (event.key === 'ArrowUp') runMoveLineScript(-1);
-            if (event.key === 'ArrowDown') runMoveLineScript(1);
-            
-        }
-        });
-
-    }
+  }
 
 
-    // Create dependency between keyboard listeners and the DOM loading.
-    document.addEventListener('DOMContentLoaded', () => {
-        addLineShiftingKeyboardListener();
+  /**
+   * Trigger runMoveLineScript() when a user presses CMD + CTRL + Up/Down
+   */
+  function addLineShiftingKeyboardListener() {
+
+    document.addEventListener('keydown', (event) => {
+      if (event.altKey) { 
+
+        if (event.key === 'ArrowUp') runMoveLineScript(-1);
+        if (event.key === 'ArrowDown') runMoveLineScript(1);
+        
+      }
     });
+
+  }
+
+
+  // Create dependency between keyboard listeners and the DOM loading.
+  document.addEventListener('DOMContentLoaded', () => {
+    addLineShiftingKeyboardListener();
+  });
     
 </script>
