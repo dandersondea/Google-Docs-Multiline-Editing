@@ -96,6 +96,8 @@ Under the current implementation the usability of this add-on is limited by rest
     2. The keyboard shortcuts are only active when the add-on's sidebar is focused, meaning moving lines requires the mouse to be used to shift focus back-and-forth between the main document and the add-on's sidebar.
     3. Selected lines must be contiguous and of type TEXT, PARAGRAPH, or LIST_ITEM in order to be shifted.
 
+Due to these limitations, the add-on was not submitted to the [Google Workspace Marketplace](https://workspace.google.com/marketplace).
+
 ### Ideal implementation
 
 The above limitations could potentially be overcome if the following ideal design was not prevented by restrictions within the Google Docs environment:
