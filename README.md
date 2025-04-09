@@ -19,7 +19,7 @@ While the usefulness of this add-on does not live up to hopes, it is nevertheles
 2. **Delete** characters from the start or end of selected line(s).
 3. **Shift** a line or selection up or down in the document using the keyboard.
 
-*Visual demo can be found on [YouTube](https://youtu.be/937-p5RZtqY).*
+*Visual demo: [YouTube](https://youtu.be/937-p5RZtqY)*
 
 ### Use
 
