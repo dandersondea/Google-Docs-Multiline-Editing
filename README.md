@@ -109,7 +109,7 @@ The above limitations could potentially be overcome if the following ideal desig
 
 1. *For multiline insert / delete,* the ideal design would be to:
 
-    1. Initialize multiple cursors that allow a user to dynamically edit multiple lines simultaneously, directly in the document. 
+    1. Initialize multiple cursors that allow a user to dynamically edit multiple lines simultaneously, directly in the document.
         1. Multiple cursors however are not supported by Google Docs.
 
 2. *For move line,* the ideal design would be to:
