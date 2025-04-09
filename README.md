@@ -1,12 +1,5 @@
 # Google Docs Multiline Editing Add-on
 
-TODO:
-
-1. Record video (<3 min) > YouTube
-    1. Update documentation to include link to YouTube video
-2. Finalize README.md
-3. SUBMIT!
-
 ## Introduction
 
 **A Google Docs add-on that enables multiline editing in the spirit of what's available in text editors like VS Code and Sublime.**
@@ -24,9 +17,9 @@ While the usefulness of this add-on does not live up to hopes, it is nevertheles
 
 1. **Insert** text at the start or end of selected line(s).
 2. **Delete** characters from the start or end of selected line(s).
-3. **Move** a line or selection up or down in the document using the keyboard.
+3. **Shift** a line or selection up or down in the document using the keyboard.
 
-**< LINK TO YOUTUBE VIDEO DEMO HERE >**
+*Visual demo can be found on [YouTube](https://youtu.be/937-p5RZtqY).*
 
 ### Use
 
@@ -54,15 +47,15 @@ While the usefulness of this add-on does not live up to hopes, it is nevertheles
     1. Choose whether you want to delete text at the start or end of the lines, then click 'Next'.
     2. Select how many characters you want to delete, then click 'Delete'.
 
-#### Move line(s)
+#### Line shifting
 
-*To move lines up or down:*
+*To shift lines up or down:*
 
 1. In your document, select any # of lines.
     1. Select lines must be contiguous.
 2. Click on the sidebar to focus it.
 3. While focused on the sidebar, hold Alt / Option (⌥) while pressing either the Up (↑) or Down (↓) arrow key.
-    1. One press of the arrow key moves the line(s) one place.
+    1. One press of the arrow key shifts the line(s) one place.
 
 #### More
 
@@ -83,12 +76,12 @@ The add-on works by reading a selection object (fallback to cursor if no selecti
     1. The user's insert / delete request is sent to the server for processing.
     2. The server then updates the text of the element(s) contained in the selection.
 
-2. *For move line:*
+2. *For line shifting:*
 
-    1. The user's move line request is sent to the server for processing, at which point the server repeatedly swaps the element(s) in the selection with their neighbors in the desired direction.
+    1. The user's line shifting request is sent to the server for processing, at which point the server repeatedly swaps the element(s) in the selection with their neighbors in the desired direction.
         1. Currently only TEXT, PARAGRAPH, and LIST_ITEM elements are supported.
-    2. In the case when multiple move line requests are entered while one is being processed, the requests are debounced and batched on the client.
-        1. Once the running request succeeds, the batched requests are sent to the server as a single request to move the selected element(s) multiple steps at once.
+    2. In the case when multiple line shifting requests are entered while one is being processed, the requests are debounced and batched on the client.
+        1. Once the running request succeeds, the batched requests are sent to the server as a single request to shift the selected element(s) multiple steps at once.
     3. After swapping, the document's selection is reset to the new position of the initially-selected elements (or in the case of a cursor, to the original position within the target line).
 
 ### Limitations
@@ -98,10 +91,10 @@ Under the current implementation the usability of this add-on is limited by rest
 1. *For multiline insert / delete:*
     1. Editing can only be done at the start and end of lines, meaning one cannot access the middle a multiline selection or edit dynamically using multiple cursors.
 
-2. *For move line:*
-    1. Execution speed is dependent on the high-latency [google.script.run](https://developers.google.com/apps-script/guides/html/reference/run) API, meaning copy/paste might be a faster way to move lines.
+2. *For line shifting:*
+    1. Execution speed is dependent on the high-latency [google.script.run](https://developers.google.com/apps-script/guides/html/reference/run) API, meaning copy/paste might be a faster way to shift lines.
     2. The keyboard shortcuts are only active when the add-on's sidebar is focused, meaning moving lines requires the mouse to be used to shift focus back-and-forth between the main document and the add-on's sidebar.
-    3. Selected lines must be contiguous and of type TEXT, PARAGRAPH, or LIST_ITEM in order to be moved.
+    3. Selected lines must be contiguous and of type TEXT, PARAGRAPH, or LIST_ITEM in order to be shifted.
 
 ### Ideal implementation
 
@@ -112,19 +105,19 @@ The above limitations could potentially be overcome if the following ideal desig
     1. Initialize multiple cursors that allow a user to dynamically edit multiple lines simultaneously, directly in the document.
         1. Multiple cursors however are not supported by Google Docs.
 
-2. *For move line,* the ideal design would be to:
+2. *For line shifting,* the ideal design would be to:
 
     1. Enable low-latency editing by using client-side JavaScript to update the document and then asynchronously sync the changes to the server.
-        1. For security and integrity reasons however, Google Docs does not expose its DOM to the browser, meaning all edits must be passed through the `google.script.run` API and processed on the server. This leads to meaningful lag between the time a user submits a move line request and when the document gets updated.
+        1. For security and integrity reasons however, Google Docs does not expose its DOM to the browser, meaning all edits must be passed through the `google.script.run` API and processed on the server. This leads to meaningful lag between the time a user submits a line shift request and when the document gets updated.
         2. Due to this lag, the following were not implemented:
-            1. Support for holding down the arrow keys to continuously move lines.
+            1. Support for holding down the arrow keys to continuously shift lines.
                 1. The lag made it too difficult to tell how many requests were being submitted when the key was held down.
             2. Support for moving elements other than TEXT, PARAGRAPH, and LIST_ITEM (*e.g.* images and tables).
                 1. The current usability of the feature did not seem worth extending the # of supported element types.
-    2. Allow the user to trigger the move line procedure while focused on the document, without having to shift the browser's focus over to the sidebar.
+    2. Allow the user to trigger the line shifting procedure while focused on the document, without having to shift the browser's focus over to the sidebar.
         1. Google Docs restricts JavaScript execution in the main document, meaning script-based keyboard listeners only work inside the sidebar or modal in which they're defined.
         2. Workarounds potentially exist but were deemed not meaningfully impactful to explore given the more-pressing limitations described above. For reference the potential workarounds are:
-            1. Place the move line function under a custom menu and then use Google's built-in menu shortcuts to connect them to the keyboard (Mac: Option (⌥) + Command (⌘) + M, then assigned letter).
+            1. Place the line shifting function under a custom menu and then use Google's built-in menu shortcuts to connect them to the keyboard (Mac: Option (⌥) + Command (⌘) + M, then assigned letter).
             2. Create a Chrome Extension and then register global keyboard shortcuts at [chrome://extensions/shortcuts](chrome://extensions/shortcuts) to call the Google Apps Script functions via `chrome.runtime.sendMessage()`.
 
 ## File structure
@@ -147,7 +140,7 @@ Server-side scripts written using JavaScript-like Google Apps Script.
 
 #### `line_switching.gs`
 
-1. Validates the user's selection and move line input.
+1. Validates the user's selection and line shift input.
 2. Reads the selected line(s) from the document and repeatedly swaps them with their neighbors until they have been shifted the requested # of lines.
 3. After swapping elements, resets the document's selection (or cursor) to the new location of the original line(s).
 
@@ -163,7 +156,7 @@ JavaScript code wrapped in HTML files to be loaded by `sidebar.html` (Google App
 #### `line_switching.html`
 
 1. Establishes keyboard listeners that trigger `line_switching.gs` when Alt / Option (⌥) + Up (↑) / Down (↓) are clicked.
-2. Debounces move line requests and, while a request is running, batches subsequent requests into a single call to be run upon successful completion of the running request.
+2. Debounces line shifting requests and, while a request is running, batches subsequent requests into a single call to be run upon successful completion of the running request.
 
 ### ui/
 
@@ -192,10 +185,10 @@ HTML files that define the visual structure of the add-on's UI.
 
 1. Add an option for parsing escape characters (which are currently interpreted as literal text).
 
-### Feature: Move line(s)
+### Feature: Line shifting
 
 *If lag can be reduced to make the feature more usable:*
 
-1. Use intervals to allow line(s) to be continuously moved by holding down the relevant keys (rather than just repeatedly pressing them).
+1. Use intervals to allow line(s) to be continuously shifted by holding down the relevant keys (rather than just repeatedly pressing them).
 2. Support moving elements beyond TEXT, PARAGRAPH, and LIST_ITEM (*e.g.* images and tables).
 3. Enable moving noncontiguous selections by reworking how `anchorSwapIndex` is defined in `line_switching.gs`.
